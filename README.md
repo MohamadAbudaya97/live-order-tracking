@@ -6,6 +6,8 @@ A small, complete example of the part of a delivery product I care most about ge
 - [`app/`](app) — Flutter with BLoC; one app, three roles (customer, store, courier)
 - [`docs/api.md`](docs/api.md) — the contract both sides are written against
 
+![Demo sign-in, the customer's live tracking screen, the store's order list and the courier's delivery screen](docs/screens.png)
+
 I build and run a delivery marketplace for a living. That code is private, so I wrote this repository from scratch to show how I approach the same problems, at a size you can read in one sitting.
 
 ## The flow
