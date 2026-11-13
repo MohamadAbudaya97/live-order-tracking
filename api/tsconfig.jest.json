@@ -1,0 +1,10 @@
+{
+  // Jest evaluates test code in a vm context, where a native import() is not available.
+  // Under "nodenext" TypeScript leaves import() as written, and the Prisma client
+  // loads its query compiler with one. Under "commonjs" it becomes a require().
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10"
+  }
+}

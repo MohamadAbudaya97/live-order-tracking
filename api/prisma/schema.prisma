@@ -1,0 +1,81 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/prisma-client"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  customer
+  store
+  courier
+}
+
+enum OrderStatus {
+  placed
+  accepted
+  preparing
+  ready
+  picked_up
+  delivered
+  cancelled
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  role      Role
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  placedOrders  Order[] @relation("customer")
+  carriedOrders Order[] @relation("courier")
+
+  @@unique([role, name])
+  @@map("users")
+}
+
+model Order {
+  id              String      @id @default(uuid()) @db.Uuid
+  code            String
+  status          OrderStatus @default(placed)
+  version         Int         @default(1)
+  lastSeq         Int         @default(1) @map("last_seq")
+  customerId      String      @map("customer_id") @db.Uuid
+  courierId       String?     @map("courier_id") @db.Uuid
+  idempotencyKey  String      @map("idempotency_key") @db.Uuid
+  items           Json
+  total           Int
+  pickup          Json
+  dropoff         Json
+  courierLocation Json?       @map("courier_location")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime    @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  customer User         @relation("customer", fields: [customerId], references: [id])
+  courier  User?        @relation("courier", fields: [courierId], references: [id])
+  events   OrderEvent[]
+
+  @@unique([customerId, idempotencyKey])
+  @@index([customerId, createdAt])
+  @@index([courierId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderEvent {
+  orderId   String   @map("order_id") @db.Uuid
+  seq       Int
+  type      String
+  data      Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@id([orderId, seq])
+  @@map("order_events")
+}

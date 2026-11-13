@@ -1,0 +1,5 @@
+dist
+coverage
+src/prisma-client
+.pgdata
+package-lock.json
